@@ -1,5 +1,4 @@
 import numpy as np
-from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 
 
@@ -46,6 +45,5 @@ B = img.transform((1280,720), Image.PERSPECTIVE, c, Image.BICUBIC)
 def ppm(im,p):
     im.convert("RGB").save(p)
 
-Path("data").mkdir(parents=True, exist_ok=True)
-A.save("data/A.ppm"); B.save("data/B.ppm")
+A.save("A.ppm"); B.save("B.ppm")
 print("true H:", c) 
