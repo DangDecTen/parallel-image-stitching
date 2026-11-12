@@ -1,14 +1,14 @@
-// io.h - image loading/saving. PNG/JPG through stb (download stb_image.h / stb_image_write.h
-// from https://github.com/nothings/stb into src/), binary PPM (P6) is built in.
+// io.h - image loading/saving. PNG/JPG through stb (stb_image.h / stb_image_write.h are in src/;
+// their implementation is compiled once in stb_impl.cpp), binary PPM (P6) is built in.
+// Authors: <TODO: Ten - MSSV, ...>
+// External sources: stb_image / stb_image_write (Sean Barrett, public domain) - https://github.com/nothings/stb
 #pragma once
 #include "common.h"
 #include <cstdio>
 #include <cstring>
 #include <string>
 #ifndef NO_STB
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #endif
 

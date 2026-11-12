@@ -1,16 +1,21 @@
 // main.cpp - CLI, benchmark loop, reporting.  ./stitch <left> <right> <out> --version <0|1|..> [--runs N]
-#include "stitch.h"
+// Authors: <TODO: Ten - MSSV, ...>
+// External sources: none (<TODO: sua neu co doan code lay/chinh tu nguon ngoai>)
+#include "versions.h"
 #include "io.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
+double g_focal_frac = -1;   // see versions.h
+
 int main(int argc, char** argv) {
-    if (argc < 4) { fprintf(stderr, "usage: %s <left> <right> <out> --version <0|1|...> [--runs N]\n", argv[0]); return 1; }
+    if (argc < 4) { fprintf(stderr, "usage: %s <left> <right> <out> --version <0|1|...> [--runs N] [--focal frac]\n", argv[0]); return 1; }
     int version = 0, runs = 5;
     for (int i = 4; i < argc; i++) {
         if (!strcmp(argv[i], "--version") && i + 1 < argc) version = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--runs") && i + 1 < argc) runs = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--focal") && i + 1 < argc) g_focal_frac = atof(argv[++i]);
     }
     Image A, B;
     if (!load_image(argv[1], A) || !load_image(argv[2], B)) { fprintf(stderr, "cannot load input images\n"); return 1; }
@@ -33,10 +38,13 @@ int main(int argc, char** argv) {
     printf("keypoints A/B: %d/%d  matches: %d  inliers: %d  stitched: %s\n", st.kpA, st.kpB, st.matches, st.inliers, ok ? "yes" : "NO");
     printf("H = [% .5f % .5f % .5f; % .5f % .5f % .5f; % .6f % .6f % .6f]\n",
            st.H[0], st.H[1], st.H[2], st.H[3], st.H[4], st.H[5], st.H[6], st.H[7], st.H[8]);
+    if (st.focal_frac > 0) printf("projection: cylindrical, f = %.2f x width = %.0f px\n", st.focal_frac, st.focal_frac * A.w);
+    else printf("projection: planar\n");
     printf("stage times (ms, mean | min):\n");
     const char* names[] = {"gray","blur","fast","brief","match","ransac","warp","h2d","d2h","total(e2e)"};
     double* pm = &mn.gray;
     for (int k = 0; k < 10; k++) printf("  %-10s %9.3f | %9.3f\n", names[k], ps[k], pm[k]);
+    printf("  %-10s %9.3f | %9.3f\n", "proj", ps[10], pm[10]);
     printf("  %-10s %9.3f\n", "kernels", sum.kernels());
     printf("CSV,%d,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", version, A.w, A.h,
            sum.gray, sum.blur, sum.fast, sum.brief, sum.match, sum.ransac, sum.warp, sum.h2d, sum.d2h, sum.total);
